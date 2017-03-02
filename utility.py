@@ -46,25 +46,3 @@ def get_input_directory():
 		return get_current_directory()
 
 	return config['data']['input']
-
-
-
-def retrieve_or_create(port_values, key):
-	"""
-	retrieve or create the holding objects (list of dictionary) from the 
-	port_values object, the holding place for all items in the portfolio.
-	"""
-
-	if key in port_values:	# key exists, retrieve
-		holding = port_values[key]	
-	else:					# key doesn't exist, create
-		if key in ['bond', 'equity', 'cash_accounts', 'expense']:
-			holding = []
-		else:
-			# not implemented yet
-			logger.error('retrieve_or_create(): invalid key: {0}'.format(key))
-			raise ValueError('invalid_key')
-
-		port_values[key] = holding
-
-	return holding
