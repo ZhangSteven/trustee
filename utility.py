@@ -46,3 +46,15 @@ def get_input_directory():
 		return get_current_directory()
 
 	return config['data']['input']
+
+
+
+def get_output_directory():
+	"""
+	Where to put the output csv files.
+	"""
+	global config
+	if config['data']['output'].strip() == '':
+		return get_current_directory()
+
+	return config['data']['output']

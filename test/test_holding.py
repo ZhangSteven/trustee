@@ -7,7 +7,8 @@ import unittest2
 from datetime import datetime
 from xlrd import open_workbook
 from trustee.utility import get_current_directory
-from trustee.holding import read_sub_section, read_section, read_holding
+from trustee.holding import read_sub_section, read_section, read_holding, \
+                        merge_position, merge_lots
 from os.path import join
 
 
@@ -29,6 +30,29 @@ class TestHolding(unittest2.TestCase):
         """
         pass
 
+
+
+    def test_merge_position(self):
+        p1 = self.create_position1()
+        p2 = self.create_position2()
+        merge_position(p1, p2)    
+        self.verify_merged_position1(p1) 
+        merge_position(p1, self.create_position4())
+        self.verify_merged_position2(p1) 
+        
+
+
+    def test_merge_lots(self):
+        bond_holding = [self.create_position1(), self.create_position2(),
+                        self.create_position3(), self.create_position4()]
+        bond_holding = merge_lots(bond_holding)
+        self.assertEqual(len(bond_holding), 2)
+        self.verify_merged_position2(bond_holding[0])
+        bond = bond_holding[1]
+        self.assertEqual(bond['isin'], 'HK002')
+        self.assertEqual(bond['par_amount'], 1000)
+        self.assertAlmostEqual(bond['average_cost'], 74)
+        
 
 
     def test_read_sub_section(self):
@@ -85,6 +109,7 @@ class TestHolding(unittest2.TestCase):
         port_values = {}
         read_holding(ws, port_values)
         bond_holding = port_values['bond']
+        self.assertEqual(port_values['portfolio_id'], '12229')
         self.assertEqual(len(bond_holding), 37)
         self.verify_bond_position1(bond_holding[0])
         self.verify_bond_position2(bond_holding[16])
@@ -195,3 +220,105 @@ class TestHolding(unittest2.TestCase):
         self.assertAlmostEqual(bond['amortized_gain_loss'], 41058.349999994)
         self.assertAlmostEqual(bond['fx_gain_loss'], 0.01)
 
+
+
+    def create_position1(self):
+        bond = {}
+        bond['isin'] = 'HK001'
+        bond['name'] = 'Far East Horizon Ltd 6.95%'
+        bond['currency'] = 'CNY'
+        bond['accounting_treatment'] = 'HTM'
+        bond['par_amount'] = 1000
+        bond['fx_on_trade_day'] = 1.2
+        bond['coupon_rate'] = 6.95/100
+        bond['coupon_start_date'] = datetime(2011,12,21)
+        bond['maturity_date'] = datetime(2016,12,21)
+        bond['average_cost'] = 80
+        bond['amortized_cost'] = 85 
+        bond['book_cost'] = 960 
+        bond['interest_bought'] = 10
+        bond['amortized_value'] = 850
+        bond['accrued_interest'] = 12
+        bond['amortized_gain_loss'] = 21
+        bond['fx_gain_loss'] = -2
+        return bond
+
+
+    def create_position2(self):
+        bond = {}
+        bond['isin'] = 'HK001'
+        bond['name'] = 'Far East Horizon Ltd 6.95%'
+        bond['currency'] = 'CNY'
+        bond['accounting_treatment'] = 'AFS'
+        bond['par_amount'] = 2000
+        bond['fx_on_trade_day'] = 1.2
+        bond['coupon_rate'] = 6.95/100
+        bond['coupon_start_date'] = datetime(2011,12,21)
+        bond['maturity_date'] = datetime(2016,12,21)
+        bond['average_cost'] = 90
+        bond['amortized_cost'] = 88 
+        bond['book_cost'] = 2060
+        bond['interest_bought'] = 35
+        bond['amortized_value'] = 1760
+        bond['accrued_interest'] = 25
+        bond['amortized_gain_loss'] = -67
+        bond['fx_gain_loss'] = 22
+        return bond
+
+
+
+    def create_position3(self):
+        bond = {}
+        bond['isin'] = 'HK002'
+        bond['name'] = 'Some other bond 8.8%'
+        bond['currency'] = 'CNY'
+        bond['accounting_treatment'] = 'HTM'
+        bond['par_amount'] = 1000
+        bond['fx_on_trade_day'] = 1.2
+        bond['coupon_rate'] = 6.95/100
+        bond['coupon_start_date'] = datetime(2011,12,21)
+        bond['maturity_date'] = datetime(2016,12,21)
+        bond['average_cost'] = 74
+        bond['amortized_cost'] = 88 
+        bond['book_cost'] = 960 
+        bond['interest_bought'] = 10
+        bond['amortized_value'] = 850
+        bond['accrued_interest'] = 12
+        bond['amortized_gain_loss'] = 21
+        bond['fx_gain_loss'] = -2
+        return bond
+
+
+
+    def create_position4(self):
+        bond = {}
+        bond['isin'] = 'HK001'
+        bond['name'] = 'Far East Horizon Ltd 6.95%'
+        bond['currency'] = 'CNY'
+        bond['accounting_treatment'] = 'AFS'
+        bond['par_amount'] = 4000
+        bond['fx_on_trade_day'] = 1.2
+        bond['coupon_rate'] = 6.95/100
+        bond['coupon_start_date'] = datetime(2011,12,21)
+        bond['maturity_date'] = datetime(2016,12,21)
+        bond['average_cost'] = 89
+        bond['amortized_cost'] = 92
+        bond['book_cost'] = 3550
+        bond['interest_bought'] = 25
+        bond['amortized_value'] = 3680
+        bond['accrued_interest'] = 57
+        bond['amortized_gain_loss'] = 33
+        bond['fx_gain_loss'] = 27.6
+        return bond
+
+
+
+    def verify_merged_position1(self, bond):
+        self.assertEqual(bond['par_amount'], 3000)
+        self.assertAlmostEqual(bond['average_cost'], 86.66666667)
+
+
+
+    def verify_merged_position2(self, bond):
+        self.assertEqual(bond['par_amount'], 7000)
+        self.assertAlmostEqual(bond['average_cost'], 88)
