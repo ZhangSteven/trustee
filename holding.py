@@ -393,6 +393,45 @@ def write_bond_holding_csv(port_values, output_dir=get_output_directory()):
 
 
 
+def write_simple_holding_csv(port_values, output_dir=get_output_directory()):
+	"""
+	The difference with the write_bond_holding_csv() is that this function 
+	extracts only a few records that enable manual comparison with records
+	extracted from Geneva Local Appraisal Report, while write_bond_holding_csv()
+	creates csv file for Geneva advantage reconciliation (DIF HTM position 
+	custom loader format)
+	"""
+	date = convert_datetime_to_string(port_values['date'])
+	portfolio_id = port_values['portfolio_id']
+	holding_file = join(output_dir, portfolio_id+'_'+date+'_trustee_nav.csv')
+		
+	with open(holding_file, 'w', newline='') as csvfile:
+		file_writer = csv.writer(csvfile, delimiter='|')
+		bond_holding = port_values['bond']
+
+		# pick all fields that HTM bond have
+		fields = ['name', 'par_amount', 'maturity_date', 'average_cost']
+		file_writer.writerow(['portfolio', 'date', 'geneva_investment_id'] + \
+								fields)
+		
+		for bond in bond_holding:
+			row = [portfolio_id, date, bond['isin']+' HTM']
+			
+			for fld in fields:
+				try:
+					item = bond[fld]
+					if fld in ['coupon_start_date', 'maturity_date'] and isinstance(item, datetime):
+						item = convert_datetime_to_string(item)
+				except KeyError:
+					item = ''
+
+				row.append(item)
+
+			file_writer.writerow(row)
+
+
+
+
 
 if __name__ == '__main__':
 	import argparse, sys, glob
@@ -435,4 +474,5 @@ if __name__ == '__main__':
 			ws = wb.sheet_by_name('Portfolio Val.')
 			read_holding(ws, port_values)
 			port_values['bond'] = merge_lots(filter_maturity(port_values['bond']))
-			write_bond_holding_csv(port_values)
+			# write_bond_holding_csv(port_values)
+			write_simple_holding_csv(port_values)
