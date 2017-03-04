@@ -26,12 +26,17 @@ def read_line(ws, row, fields):
 		if isinstance(cell_value, str):
 			cell_value = cell_value.strip()
 
-		position[fld] = cell_value
-		if fld == 'Description':
+		if fld == 'Portfolio' and isinstance(cell_value, float):
+			cell_value = str(int(cell_value))
+
+		elif fld == 'Description':
 			m = re.search('\d{2}/\d{2}/\d{2}', cell_value)
-			if not m is None:
+			if m is None:
+				position['MaturityDate'] = ''
+			else:
 				position['MaturityDate'] = get_maturity_date(m.group(0))
 
+		position[fld] = cell_value
 		i = i + 1
 
 	return position
@@ -46,8 +51,8 @@ def get_maturity_date(date_string):
 	try:
 		return datetime(int(tokens[2])+2000, int(tokens[0]), int(tokens[1]))
 	except:
-		logger.error('get_maturity_date(): failed to convert date string {0}'.format(date_string))
-		raise InvalidDateString()
+		logger.warning('get_maturity_date(): unable to convert date string {0}'.format(date_string))
+		return ''
 
 
 
@@ -59,7 +64,8 @@ def filter_maturity(holding):
 	new_holding = []
 	for position in holding:
 		if position['Group1'] == 'Cash and Equivalents' or \
-			'MaturityDate' in position and \
+			position['Group2'] == 'Cash and Equivalents' or \
+			isinstance(position['MaturityDate'], datetime) and \
 			position['MaturityDate'] < datetime(2017,1,1):
 			
 			continue
@@ -76,7 +82,7 @@ def write_bond_holding_csv(holding, filename, output_dir=get_output_directory())
 		file_writer = csv.writer(csvfile, delimiter='|')
 	
 		# pick all fields that HTM bond have
-		fields = ['InvestID', 'ExtendedDescription', 'Quantity', 'UnitCost', 'MaturityDate']
+		fields = ['Portfolio', 'InvestID', 'ExtendedDescription', 'Quantity', 'UnitCost', 'MaturityDate']
 
 		file_writer.writerow(fields)
 		
@@ -86,7 +92,7 @@ def write_bond_holding_csv(holding, filename, output_dir=get_output_directory())
 			for fld in fields:
 				try:
 					item = bond[fld]
-					if fld == 'MaturityDate':
+					if fld == 'MaturityDate' and isinstance(item, datetime):
 						item = convert_datetime_to_string(item)
 				except KeyError:
 					item = ''
