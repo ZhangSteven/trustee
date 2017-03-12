@@ -58,3 +58,13 @@ def get_output_directory():
 		return get_current_directory()
 
 	return config['data']['output']
+
+
+
+def retrieve_or_create(port_values, key):
+	if not key in port_values:
+		# print('create')
+		port_values[key] = []
+
+	# print('retrieve')
+	return port_values[key]

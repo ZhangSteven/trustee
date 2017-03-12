@@ -24,6 +24,9 @@ class BadAccountingTreatment(Exception):
 class UnrecognizedHoldingLine(Exception):
 	pass
 
+class InvalidFundName(Exception):
+	pass
+
 
 
 def read_holding(ws, port_values):
@@ -188,7 +191,7 @@ def read_sub_section(ws, row, accounting_treatment, fields, asset_class, currenc
 
 
 
-def read_portfolio_id(ws, row):
+def map_portfolio_id(fund_name):
 	p_map = {
 		'CLI HK BR Trust Fund (Capital) (Sub-Fund-Bond)':'12732',
 		'CLI HK BR Trust Fund (Capital)':'12857',
@@ -205,7 +208,11 @@ def read_portfolio_id(ws, row):
 		'CLI Overseas Trust Fund (Capital) (Sub-Fund-Bond)':'12733',
 		'CLI Overseas Trust Fund (Capital)':'12856'
 	}
+	return p_map[fund_name]
 
+
+
+def read_portfolio_id(ws, row):
 	while (row < ws.nrows):
 		cell_value = ws.cell_value(row, 0)
 		if isinstance(cell_value, str) and \
@@ -214,9 +221,10 @@ def read_portfolio_id(ws, row):
 			if m is None:
 				logger.error('read_portfolio_id(): failed to get fund name at row {0}, {1}'.
 								format(row, cell_value))
+				raise InvalidFundName()
 
 			try:
-				return p_map[m.group(0)[8:-4].strip()], row
+				return map_portfolio_id(m.group(0)[8:-4].strip()), row
 			except KeyError:
 				logger.error('read_portfolio_id(): fund name {0} does not find a match'.
 								format(m.group(0)[8:-4].strip()))
@@ -325,6 +333,30 @@ def find_position(positions, isin):
 			return position
 
 	return None
+
+
+
+def get_security_id_map():
+	i_map = {
+		'WLHKFN09007':'BBG00000WLY9',	# WING LUNG BANK LTD CHINAM 5.7 12/28/21
+		'DBANFB12014':'HK0000175916',	# DRAGON DAYS LTD CHMERC 6 03/21/22
+		'HSBCFN13014':'HK0000163607'	# New World Development 6% Sept 2023
+	}
+
+	return i_map
+
+
+
+def rename_position_isin(positions):
+	"""
+	Map trustee security code to investment code used in Geneva.
+	"""
+	i_map = get_security_id_map()	
+	for position in positions:
+		if position['isin'] in i_map:
+			position['isin'] = i_map[position['isin']]
+
+	return positions
 
 
 
@@ -473,6 +505,6 @@ if __name__ == '__main__':
 			wb = open_workbook(filename=input_file)
 			ws = wb.sheet_by_name('Portfolio Val.')
 			read_holding(ws, port_values)
-			port_values['bond'] = merge_lots(filter_maturity(port_values['bond']))
+			port_values['bond'] = rename_position_isin(merge_lots(filter_maturity(port_values['bond'])))
 			# write_bond_holding_csv(port_values)
 			write_simple_holding_csv(port_values)
