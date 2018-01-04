@@ -1,10 +1,12 @@
 # trustee
 
-Handle China Life trustee files.
+Handle China Life trustee position files and Geneva position files.
 
 
 
 +++++++++
-ver 0.01
+ver 0.1
 +++++++++
+
+
 

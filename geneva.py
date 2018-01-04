@@ -76,7 +76,6 @@ def filter_maturity(holding):
 
 
 
-
 def write_bond_holding_csv(holding, filename, output_dir=get_output_directory()):
 	with open(join(output_dir, filename+'_output.csv'), 'w', newline='') as csvfile:
 		file_writer = csv.writer(csvfile, delimiter='|')

@@ -1,7 +1,7 @@
 # coding=utf-8
 # 
 import configparser, os
-from config_logging.file_logger import get_file_logger
+# from config_logging.file_logger import get_file_logger
 
 
 
@@ -24,10 +24,10 @@ def get_current_directory():
 
 
 
-# initialize logger
-if not 'logger' in globals():
-	logger = get_file_logger(os.path.join(get_current_directory(), 'trustee.log'), 
-								config['logging']['log_level'])
+# # initialize logger
+# if not 'logger' in globals():
+# 	logger = get_file_logger(os.path.join(get_current_directory(), 'trustee.log'), 
+# 								config['logging']['log_level'])
 
 
 

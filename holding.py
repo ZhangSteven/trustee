@@ -7,7 +7,7 @@
 
 from xlrd import open_workbook
 from xlrd.xldate import xldate_as_datetime
-from trustee.utility import logger, get_input_directory, get_datemode, \
+from trustee.utility import get_input_directory, get_datemode, \
 						get_output_directory
 from DIF.open_holding import read_bond_fields
 from DIF.utility import retrieve_or_create
@@ -15,6 +15,8 @@ from DIF.open_dif import convert_datetime_to_string
 from bochk.open_bochk import retrieve_date_from_filename
 from datetime import datetime
 import re, csv
+import logging
+logger = logging.getLogger(__name__)
 
 
 
