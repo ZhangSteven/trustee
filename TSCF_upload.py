@@ -3,20 +3,14 @@
 # Create TSCF uplad file for the two data fields -- "Yield at Cost"
 # and "Purchase Cost" -- for the HTM portfolios in Bloomberg AIM.
 #
-# 目标是生成两个具有下列格式的CSV文件（除前两行header row之外，从第三行
-# 开始每一行代表一个Position）：
-#
-# 第一个文件，上传一个组合中每一个Position的Yield at Cost,
+# 目标是生成具有下列格式的CSV文件。除前两行header row之外，从第三行
+# 开始每一行代表一个data field，
 # 
 # Upload Method,INCREMENTAL,,,,
 # Field Id,Security Id Type,Security Id,Account Code,Numeric Value,Char Value
 # CD021,4,XS1556937891,12229,7.889,7.889
-# 
-# 第二个文件，上传一个组合中每一个Position的Purchase Cost,
-# 
-# Upload Method,INCREMENTAL,,,,
-# Field Id,Security Id Type,Security Id,Account Code,Numeric Value,Char Value
 # CD022,4,XS1556937891,12229,98.89,98.89
+# CD023,4,XS1556937891,12229,1289,1289
 # 
 # 
 # 为实现上述目的，对于每一个组合我们需要读取两个文件：
@@ -88,6 +82,11 @@ def update_position(geneva_holding, jones_holding):
 
 		except PositionNotFound:
 			pass
+
+		if position['maturity_date'] != '':
+			# do something to workout number of days between
+			# maturity date to last year end.
+
 
 
 
