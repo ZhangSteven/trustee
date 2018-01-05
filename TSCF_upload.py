@@ -34,6 +34,7 @@ from trustee.utility import get_output_directory, get_input_directory, \
 							get_current_directory
 from trustee.geneva import read_line
 from trustee.quick_holding import is_cash_position, is_AFS_position
+from datetime import date, timedelta
 import logging
 logger = logging.getLogger(__name__)
 
@@ -83,10 +84,21 @@ def update_position(geneva_holding, jones_holding):
 		except PositionNotFound:
 			pass
 
-		if position['maturity_date'] != '':
-			# do something to workout number of days between
-			# maturity date to last year end.
+		if position['MaturityDate'] == '':
+			position['Maturity to Last Year End'] = 0
+		else:
+			position['Maturity to Last Year End'] = get_days_maturity_LYE(position['MaturityDate'])
 
+
+
+def get_days_maturity_LYE(maturity_date):
+	"""
+	Workout the number of days between the maturity date (of type
+	datetime.datetime) and the last year end (LYE).
+	"""
+	m = date(maturity_date.year, maturity_date.month, maturity_date.day)
+	lye = date(date.today().year-1, 12, 31)
+	return (m - lye).days
 
 
 
@@ -133,9 +145,13 @@ def write_upload_csv(geneva_holding, output_dir=get_output_directory()):
 					position['Portfolio'],position['Yield at Cost'],position['Yield at Cost']]
 			row2 = ['CD022','4',get_ISIN_from_investID(position['InvestID']),
 					position['Portfolio'],position['Purchase Cost'],position['Purchase Cost']]
+			row3 = ['CD023','4',get_ISIN_from_investID(position['InvestID']),
+					position['Portfolio'],position['Maturity to Last Year End'],
+					position['Maturity to Last Year End']]
 			
 			file_writer.writerow(row1)
 			file_writer.writerow(row2)
+			file_writer.writerow(row3)
 
 
 
