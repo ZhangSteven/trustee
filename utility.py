@@ -49,6 +49,19 @@ def get_input_directory():
 
 
 
+def get_geneva_input_directory():
+	"""
+	Where the input files reside.
+	"""
+	global config
+	if config['data']['geneva_input'].strip() == '':
+		return get_current_directory()
+
+	return config['data']['geneva_input']
+
+
+
+
 def get_output_directory():
 	"""
 	Where to put the output csv files.
@@ -58,6 +71,12 @@ def get_output_directory():
 		return get_current_directory()
 
 	return config['data']['output']
+
+
+
+def get_exchange_file():
+	global config
+	return config['data']['exchange_file']
 
 
 

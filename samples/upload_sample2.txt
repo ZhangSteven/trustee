@@ -1,0 +1,5 @@
+sample 2
+
+# Exchange rate
+USDHKD = 7.88
+

@@ -7,9 +7,11 @@ import unittest2
 from xlrd import open_workbook
 from trustee.utility import get_current_directory
 from small_program.read_file import read_file
-from trustee.TSCF_upload import read_line_jones, update_position
+from trustee.TSCF_upload import read_line_jones, update_position, \
+                                get_days_maturity_LYE
 from trustee.geneva import read_line
 from os.path import join
+from datetime import datetime
 
 
 
@@ -55,6 +57,14 @@ class TestTSCFUpload(unittest2.TestCase):
         self.verify_geneva_position1(geneva_holding[1])
         self.verify_geneva_position2(geneva_holding[4])
         self.verify_geneva_position3(geneva_holding[87])
+
+
+
+    def test_get_days_maturity_LYE(self):
+        # The test works only in year 2018. Need to change the number
+        # of days since last year end if testing in year 2019 or later.
+        self.assertEqual(get_days_maturity_LYE(datetime(2019,2,1)), 397)
+        self.assertEqual(get_days_maturity_LYE(datetime(2018,1,25)), 25)
 
 
 

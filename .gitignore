@@ -6,3 +6,7 @@ __pycache__/
 
 # ignore the output csv files
 *.csv
+
+# ignore the winscp script files and logs
+winscp_script/
+winscp_log/
