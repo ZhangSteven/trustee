@@ -92,11 +92,31 @@ def get_exchange_rate(currency_description):
 
 
 
+def date_to_string():
+	"""
+	Convert today's date to string, say 2018-1-9, it is converted to
+	string '20180109'.
+	"""
+	t = date.today()
+	return str(t.year*10000 + t.month*100 + t.day)
+
+
+
+def get_lye_file_name():
+	return 'f3321tscf.days_since_lye.' + date_to_string() + '.inc'
+
+
+
+def get_exc_file_name():
+	return 'f3321tscf.exchange_rate.' + date_to_string() + '.inc'
+
+
+
 def write_upload_csv_lye(bond_list=get_bond_list(), output_dir=get_output_directory()):
 	"""
 	Create the "days since last year end" upload file.
 	"""
-	upload_file = join(output_dir, 'f3321tscf.days_since_lye.inc')
+	upload_file = join(output_dir, get_lye_file_name())
 	with open(upload_file, 'w', newline='') as csvfile:
 
 		file_writer = csv.writer(csvfile, delimiter=',')
@@ -117,7 +137,7 @@ def write_upload_csv_exc(holding, output_dir=get_output_directory()):
 	"""
 	Create the "exchange rate" upload file.
 	"""
-	upload_file = join(output_dir, 'f3321tscf.exchange_rate.inc')
+	upload_file = join(output_dir, get_exc_file_name())
 	with open(upload_file, 'w', newline='') as csvfile:
 
 		file_writer = csv.writer(csvfile, delimiter=',')
@@ -138,12 +158,13 @@ def write_upload_csv_exc(holding, output_dir=get_output_directory()):
 
 
 if __name__ == '__main__':
+	# Testing code here.
+	# 
+	# Actual code to do periodic upload is in do_upload.py
+	# 
 	import logging.config
 	logging.config.fileConfig('logging.config', disable_existing_loggers=False)
 
-	logger.info('start to create TSCF upload LYE file.')
+	logger.info('start to create TSCF upload file.')
 	upload_file_lye = write_upload_csv_lye()
-
-	# Read all Geneva local appraisal files
-	logger.info('start to create TSCF upload EXC file.')
 	upload_file_exc = write_upload_csv_exc(consolidate_security(get_holding_from_files()))
