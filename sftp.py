@@ -169,14 +169,12 @@ def get_winscp_path():
 
 
 def get_winscp_script_directory():
-	global config
-	return config['winscp']['script_dir']
+	return join(get_current_directory(), 'winscp_script')
 
 
 
 def get_winscp_log_directory():
-	global config
-	return config['winscp']['log_dir']
+	return join(get_current_directory(), 'winscp_log')
 
 
 
