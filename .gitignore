@@ -10,3 +10,6 @@ __pycache__/
 # ignore the winscp script files and logs
 winscp_script/
 winscp_log/
+
+# ignore the sftp config file, because production is using Bloomberg private router
+sftp.config
