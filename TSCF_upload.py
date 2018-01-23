@@ -1,9 +1,11 @@
 # coding=utf-8
 # 
-# Create TSCF uplad file for the two data fields -- "Yield at Cost"
-# and "Purchase Cost" -- for the HTM portfolios in Bloomberg AIM.
+# Create TSCF uplad files for the Bloomberg AIM.
+# 
+# File 1 is for two data fields -- "Yield at Cost" and "Purchase Cost" 
+# -- for each position in trustee fixed income portfolios in Bloomberg AIM.
 #
-# 目标是生成具有下列格式的CSV文件。除前两行header row之外，从第三行
+# File 1 是具有下列格式的CSV文件。除前两行header row之外，从第三行
 # 开始每一行代表一个data field，
 # 
 # Upload Method,INCREMENTAL,,,,
@@ -25,6 +27,15 @@
 # 		Purchase Cost都相同。但是这并不能保证将来也是如此。本文件在 
 # 		samples/Jones Holding 2017.12.20.xlsx
 #
+# 
+# File 2 is for another data field -- "days between last year end and
+# maturity" -- for each security in trustee fixed income portfolios in
+# Bloomberg AIM. Because a bond (except a few) has "days to maturity"
+# data field in Bloomberg, therefore combining the two we can calculate
+# how many dates between today and the end of last year. File 2 needs to
+# be uploaded per security at the beginning of each year.
+# 
+# 
 
 
 
